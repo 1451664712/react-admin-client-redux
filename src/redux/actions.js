@@ -1,18 +1,35 @@
 /*
 * 包含n个用来创建action的工厂函数
 * */
-import {INCREMENT, DECREMENT} from "./action-types";
+import {SET_HEAD_TITLE, RECEIVE_USER, SHOW_ERROR_MSG, RESET_USER} from "./action-types";
+import {reqLogin} from "../api";
+import storageUtils from "../utils/storageUtils";
 
-export const increment = (number) => ({type: INCREMENT, data: number})
+export const setHeadTitle = (headTitle) => ({type: SET_HEAD_TITLE, data: headTitle})
 
-export const decrement = (number) => ({type: DECREMENT, data: number})
-// 增加的异步action： 返回的是函数
-export const incrementAsync = (number) => {
-    return dispatch => {
-        setTimeout(() => {
-            // 分发同步action
-            dispatch(increment(number))
-        }, 1000)
+export const receiveUser = (user) => ({type: RECEIVE_USER, data: user})
+
+export const showErrorMsg = (errorMsg) => ({type: SHOW_ERROR_MSG, data: errorMsg})
+
+//
+export const logout = () => {
+    // 先清除本地缓存
+    storageUtils.removeUser()
+    // 返回action对象
+    return {type: RESET_USER}
+}
+// 登录一步action
+
+export const login = (username, password) => {
+    return async dispatch => {
+        const result = await reqLogin(username, password)
+        if (result.status === 0) {
+            const user = result.data
+            dispatch(receiveUser(user))
+        } else {
+            const msg = result.msg
+            dispatch(showErrorMsg(msg))
+        }
     }
 }
 

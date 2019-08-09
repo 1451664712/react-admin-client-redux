@@ -1,16 +1,21 @@
 import React, {Component} from 'react'
 import {withRouter} from 'react-router-dom'
-import {Modal, message} from 'antd';
+import {
+    Modal,
+    // message
+    } from 'antd';
 import './index.less'
 import {formateDate} from '../../utils/dateUtils'
 import {reqWeather} from '../../api'
 
 import menuList from '../../config/menuConfig'
 // 内存存储
-import memoryUtils from '../../utils/memoryUtils'
+// import memoryUtils from '../../utils/memoryUtils'
 // 本地 存储
-import storageUtils from '../../utils/storageUtils'
+// import storageUtils from '../../utils/storageUtils'
 import LinkButton from '../../components/link-button'
+import {connect} from 'react-redux'
+import {logout} from '../../redux/actions'
 
 class Header extends Component {
     state = {
@@ -61,10 +66,11 @@ class Header extends Component {
             okText: '确认',
             cancelText: '取消',
             onOk: () => {
-                memoryUtils.user = {};
-                storageUtils.removeUser();
-                message.success('系统已退出！')
-                this.props.history.replace('/login')
+                // memoryUtils.user = {};
+                // storageUtils.removeUser();
+                // message.success('系统已退出！')
+                this.props.logout()
+                // this.props.history.replace('/login')
             }
         });
     }
@@ -81,8 +87,9 @@ class Header extends Component {
 
     render() {
         const {currentTime, dayPictureUrl, weather} = this.state;
-        const {username} = memoryUtils.user
-        const title = this.getTitle()
+        // const {username} = memoryUtils.user
+        const {username} = this.props.user
+        const title = this.props.headTitle
         return (
             <div className="header_nav">
                 <div className="header_top">
@@ -105,4 +112,10 @@ class Header extends Component {
     }
 }
 
-export default withRouter(Header)
+export default connect(
+    state => ({
+        headTitle: state.headTitle,
+        user: state.user
+    }),
+    {logout}
+)(withRouter(Header))

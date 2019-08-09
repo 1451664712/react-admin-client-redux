@@ -3,10 +3,13 @@ import {Link, withRouter} from 'react-router-dom'
 import {Menu, Icon} from 'antd';
 
 // 左侧导航
-import './index.css'
+import './index.less'
 import logo from '../../assets/images/player.gif'
 import menuList from '../../config/menuConfig'
-import memoryUtils from "../../utils/memoryUtils";
+// import memoryUtils from "../../utils/memoryUtils";
+
+import {connect} from 'react-redux'
+import {setHeadTitle} from '../../redux/actions'
 
 const {SubMenu} = Menu;
 
@@ -45,8 +48,10 @@ class LeftNav extends Component {
     // 判断当前用户是有否item权限
     hasAuth = (item) => {
         const {key, isPublic} = item
-        const menus = memoryUtils.user.role.menus
-        const username = memoryUtils.user.username
+        // const menus = memoryUtils.user.role.menus
+        // const username = memoryUtils.user.username
+        const menus = this.props.user.role.menus
+        const username = this.props.user.username
         /*
         * 1 如果当前用户是admin
         * 2 如果当前item是公开的
@@ -66,9 +71,14 @@ class LeftNav extends Component {
         return menuList.reduce((pre, item) => {
             if (this.hasAuth(item)) {
                 if (!item.children) {
+                    if (item.key === path || path.indexOf(item.key) !== -1) {
+                        this.props.setHeadTitle(item.title)
+                    }
                     pre.push((
                         <Menu.Item key={item.key}>
-                            <Link to={item.key}>
+                            <Link to={item.key} onClick={() => {
+                                this.props.setHeadTitle(item.title)
+                            }}>
                                 <Icon type={item.icon}/>
                                 <span>{item.title}</span>
                             </Link>
@@ -138,4 +148,7 @@ class LeftNav extends Component {
 
 // withRouter 包装非路由组件，返回一个新组件，
 // 新组建向非路由组件传递三个属性
-export default withRouter(LeftNav)
+export default connect(
+    state => ({user: state.user}),
+    {setHeadTitle}
+)(withRouter(LeftNav))
