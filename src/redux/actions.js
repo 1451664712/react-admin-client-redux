@@ -25,6 +25,7 @@ export const login = (username, password) => {
         const result = await reqLogin(username, password)
         if (result.status === 0) {
             const user = result.data
+            storageUtils.saveUser(user)
             dispatch(receiveUser(user))
         } else {
             const msg = result.msg

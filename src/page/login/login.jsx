@@ -66,6 +66,7 @@ class Login extends Component {
         // 判断用户是否登陆
         // const user = memoryUtils.user;
         const user = this.props.user;
+        console.log()
         if (user && user._id) {
             // return <Redirect to="/" />
             return <Redirect to="/home" />
